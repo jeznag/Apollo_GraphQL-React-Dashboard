@@ -73,6 +73,7 @@ const getDashboardAllDataQuery = gql`
       emissions
       fuelEconomy
       timeTraveled
+      fuelLeft
       recentTrip {
         id
         score

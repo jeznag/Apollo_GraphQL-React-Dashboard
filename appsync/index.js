@@ -94,6 +94,8 @@ async function getTripSummaryData(userId, authToken) {
   return await fetchJSON(travelDistanceTotalUrl.toString(), {}, authToken);
 }
 
+
+
 async function getDetailsForVehicle(userId, vehicleId, authToken) {
   const [
     vehicleData,
@@ -103,6 +105,8 @@ async function getDetailsForVehicle(userId, vehicleId, authToken) {
     diagnosticIssueForVehicle,
     recentTrip,
     parkedUserVehicles
+    
+    
   ] = await Promise.all([
     getVehicleData(vehicleId, authToken),
     getRefillData(vehicleId, authToken),
@@ -110,9 +114,10 @@ async function getDetailsForVehicle(userId, vehicleId, authToken) {
     getTripsForVehicle(vehicleId, authToken),
     getDiagnosticIssueForVehicle(vehicleId, authToken),
     getRecentTrip(vehicleId, authToken),
-    getParkedUserVehicles(userId, authToken)
+    getParkedUserVehicles(userId, authToken),
+    
   ]);
-
+  const fuelLeft = await calculateFuelLeft(refillData, tripsForVehicle);
   const finalResult = {
     id: vehicleId,
     make: vehicleData.make,
@@ -136,16 +141,41 @@ async function getDetailsForVehicle(userId, vehicleId, authToken) {
     accelerationScore: tripSummaryData.accelerationScore,
     totalScore: tripSummaryData.score,
     travelDistanceThisYear: 100,
-    fuelLeft: 999,
     parking: recentTrip.location,
     timeTraveled: tripSummaryData.TODO,
     trips: tripsForVehicle,
     lifeLitresPerHundredKm: tripsForVehicle,
     recentTrip: recentTrip,
-    parkedVehicle: parkedUserVehicles
+    parkedVehicle: parkedUserVehicles,
+    fuelLeft: fuelLeft
   };
   return finalResult;
 }
+
+const calculateFuelLeft = async (refillData, trips) => {
+      console.log(refillData, trips, 'REFILLDATA AND TRIPS')
+      const refillTimeStamp = new Date(refillData[0].timestamp);
+      const refillLitres = parseFloat(refillData[0].litres);
+    
+      const filteredTrips = trips.filter((trips) => {
+          return refillTimeStamp <= new Date(trips.endTime);
+      });
+  
+      const totalLitresUsed = filteredTrips.reduce((total, trip)=>{
+          return total + parseFloat(trip.litres);
+        }, 0);
+      
+      const totalDistance = filteredTrips.reduce((total, trip)=> {
+          return total + parseFloat(trip.distance);
+      }, 0);
+  
+      const litresLeft = refillLitres - totalLitresUsed;
+      const averagePer100Km =  (totalLitresUsed / totalDistance) * 100;
+      const kmsLeft = (totalDistance / totalLitresUsed) * litresLeft;
+      return totalDistance;
+      
+}
+
 
 async function getLogin(email, password) {
   const loginURL = `${API_URL}users/login`;
@@ -202,4 +232,7 @@ exports.handler = async (event, context) => {
     default:
       return "Unknown field, unable to resolve" + event.field;
   }
+  
+
 };
+
