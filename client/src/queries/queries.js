@@ -58,7 +58,9 @@ const getDashboardAllDataQuery = gql`
         lat
         lng
       }
-      fuelLeft
+      kmsLeft
+      averagePer100Km
+      litresLeft
       travelSince
       diagnosticIssue {
         code
@@ -104,9 +106,17 @@ const getDashboardAllDataQuery = gql`
         }
         startLocation {
           displayName
+          geoPoint {
+            lat
+            lng
+          }
         }
         endLocation {
           displayName
+          geoPoint {
+            lat
+            lng
+          }
         }
       }
       parkedVehicle {
