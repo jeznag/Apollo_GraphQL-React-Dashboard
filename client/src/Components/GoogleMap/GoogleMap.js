@@ -1,6 +1,6 @@
-import React, { Component } from "react";
-import { Map, GoogleApiWrapper } from "google-maps-react";
-import { Header, Icon, Segment } from "semantic-ui-react";
+import React, { Component } from 'react';
+import { Map, GoogleApiWrapper } from 'google-maps-react';
+import { Header, Icon, Segment } from 'semantic-ui-react';
 
 class SimpleMap extends Component {
   // constructor(props) {
@@ -44,8 +44,7 @@ class SimpleMap extends Component {
             google={this.props.google}
             zoom={9}
             initialCenter={{ lat: 45.4211, lng: -75.6903 }}
-          >
-          </Map>
+          ></Map>
         </div>
       </Segment>
     );
@@ -56,5 +55,5 @@ class SimpleMap extends Component {
 // because we whitelist URLs from the google maps console
 // If someone tries to use our key, they won't be able to use it anywhere except localhost
 export default GoogleApiWrapper({
-  apiKey: `AIzaSyB05HDuP6Jvdsy8jUcnvvkrW-Qq0Uluoyw`
+  apiKey: `AIzaSyB05HDuP6Jvdsy8jUcnvvkrW-Qq0Uluoyw`,
 })(SimpleMap);

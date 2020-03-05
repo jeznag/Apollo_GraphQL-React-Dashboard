@@ -35,6 +35,6 @@ DashboardPage.getInitialProps = ctx => {
   return {
     cookiez: Cookiez(ctx) || '',
     token,
-    userId
+    userId,
   };
 };

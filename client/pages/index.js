@@ -8,14 +8,13 @@ import { useRouter } from 'next/router';
 
 function handleSuccessfulLogin(router) {
   return function(loginResult) {
-    document.cookie = `GofarDashboardUserId=${loginResult.userId};`
-    document.cookie = `GofarDashboardToken=${loginResult.authToken};`
+    document.cookie = `GofarDashboardUserId=${loginResult.userId};`;
+    document.cookie = `GofarDashboardToken=${loginResult.authToken};`;
     router.push('/dashboard');
   };
 }
 
 export default function LoginPage(props) {
-
   const router = useRouter();
 
   const client = new ApolloClient({
@@ -33,7 +32,6 @@ export default function LoginPage(props) {
         {...props}
         handleSuccessfulLogin={handleSuccessfulLogin(router)}
       />
-      
     </ApolloProvider>
   );
 }
