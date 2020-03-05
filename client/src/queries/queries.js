@@ -92,6 +92,7 @@ const getDashboardAllDataQuery = gql`
         }
       }
       trips {
+        numberOfEvents
         litres
         litresPerHundredKm
         distance

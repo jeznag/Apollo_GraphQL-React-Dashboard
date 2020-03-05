@@ -94,8 +94,6 @@ async function getTripSummaryData(userId, authToken) {
   return await fetchJSON(travelDistanceTotalUrl.toString(), {}, authToken);
 }
 
-
-
 async function getDetailsForVehicle(userId, vehicleId, authToken) {
   const [
     vehicleData,
@@ -105,8 +103,6 @@ async function getDetailsForVehicle(userId, vehicleId, authToken) {
     diagnosticIssueForVehicle,
     recentTrip,
     parkedUserVehicles
-    
-    
   ] = await Promise.all([
     getVehicleData(vehicleId, authToken),
     getRefillData(vehicleId, authToken),
@@ -114,10 +110,9 @@ async function getDetailsForVehicle(userId, vehicleId, authToken) {
     getTripsForVehicle(vehicleId, authToken),
     getDiagnosticIssueForVehicle(vehicleId, authToken),
     getRecentTrip(vehicleId, authToken),
-    getParkedUserVehicles(userId, authToken),
-    
+    getParkedUserVehicles(userId, authToken)
   ]);
-  const fuelLeft =  calculateFuelLeft(refillData, tripsForVehicle);
+  const fuelLeft = calculateFuelLeft(refillData, tripsForVehicle);
   const finalResult = {
     id: vehicleId,
     make: vehicleData.make,
@@ -150,41 +145,63 @@ async function getDetailsForVehicle(userId, vehicleId, authToken) {
     fuelLeft: fuelLeft.kmsLeft,
     averagePer100Km: fuelLeft.averagePer100Km,
     litresLeft: fuelLeft.litresLeft
-    
-
   };
   return finalResult;
 }
 
-const calculateFuelLeft =  (refillData, trips) => {
-      const refillTimeStamp = new Date(refillData[0].timestamp);
-      const refillLitres = parseFloat(refillData[0].litres);
-    
-      const filteredTrips = trips.filter((trips) => {
-          return refillTimeStamp <= new Date(trips.endTime);
-      });
-  
-      const totalLitresUsed = filteredTrips.reduce((total, trip)=>{
-          return total + parseFloat(trip.litres);
-        }, 0);
-      
-      const totalDistance = filteredTrips.reduce((total, trip)=> {
-          return total + parseFloat(trip.distance);
-      }, 0);
-  
-      const litresLeft = refillLitres - totalLitresUsed;
-      const averagePer100Km =  (totalLitresUsed / totalDistance) * 100;
-      const kmsLeft = (litresLeft / averagePer100Km) * 100;
-      
-      return {kmsLeft, averagePer100Km, litresLeft}
-      
-}
+const calculateFuelLeft = (refillData, trips) => {
+  const refillTimeStamp = new Date(refillData[0].timestamp);
+  const refillLitres = parseFloat(refillData[0].litres);
 
+  const filteredTrips = trips.filter(trips => {
+    return refillTimeStamp <= new Date(trips.endTime);
+  });
+
+  const totalLitresUsed = filteredTrips.reduce((total, trip) => {
+    return total + parseFloat(trip.litres);
+  }, 0);
+
+  const totalDistance = filteredTrips.reduce((total, trip) => {
+    return total + parseFloat(trip.distance);
+  }, 0);
+
+  const litresLeftFunc = (refillLitres, totalLitresUsed) => {
+    if (!refillLitres && !totalLitresUsed) {
+      return 0;
+    } else {
+      return refillLitres - totalLitresUsed;
+    }
+  };
+  const litresLeft = litresLeftFunc(refillLitres, totalLitresUsed);
+
+  const averagePer100KmFunc = (totalLitresUsed, totalDistance) => {
+    if (!totalLitresUsed || !totalDistance) {
+      return 0;
+    } else {
+      return (totalLitresUsed / totalDistance) * 100;
+    }
+  };
+
+  const kmsLeftFunc = (litresLeft, averagePer100Km) => {
+    if (!litresLeft || !averagePer100Km) {
+      return 0;
+    } else {
+      return (litresLeft / averagePer100Km) * 100;
+    }
+  };
+  // const oldAveragePer100Km = averagePer100Km;
+  const averagePer100Km = averagePer100KmFunc(totalLitresUsed, totalDistance);
+  const kmsLeft = kmsLeftFunc(litresLeft, averagePer100Km);
+
+  return { kmsLeft, averagePer100Km, litresLeft };
+};
 
 async function getLogin(email, password) {
   const loginURL = `${API_URL}users/login`;
   return await postJSON(loginURL.toString(), { email, password });
 }
+
+exports.calculateFuelLeft = calculateFuelLeft;
 
 exports.handler = async (event, context) => {
   console.log("Received event", JSON.stringify(event, 3));
@@ -236,7 +253,4 @@ exports.handler = async (event, context) => {
     default:
       return "Unknown field, unable to resolve" + event.field;
   }
-  
-
 };
-

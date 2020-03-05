@@ -4,11 +4,14 @@
   "description": "",
   "main": "goFarAPIResolver.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "isomorphic-fetch": "^2.2.1"
+  },
+  "devDependencies": {
+    "jest": "^25.1.0"
   }
 }
