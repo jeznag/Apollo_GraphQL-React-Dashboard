@@ -116,3 +116,4 @@ class AntdTableComponent extends React.Component {
 }
 
 export default AntdTableComponent;
+

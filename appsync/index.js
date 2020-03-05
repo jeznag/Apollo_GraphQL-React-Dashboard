@@ -117,7 +117,7 @@ async function getDetailsForVehicle(userId, vehicleId, authToken) {
     getParkedUserVehicles(userId, authToken),
     
   ]);
-  const fuelLeft = await calculateFuelLeft(refillData, tripsForVehicle);
+  const fuelLeft =  calculateFuelLeft(refillData, tripsForVehicle);
   const finalResult = {
     id: vehicleId,
     make: vehicleData.make,
@@ -147,13 +147,16 @@ async function getDetailsForVehicle(userId, vehicleId, authToken) {
     lifeLitresPerHundredKm: tripsForVehicle,
     recentTrip: recentTrip,
     parkedVehicle: parkedUserVehicles,
-    fuelLeft: fuelLeft
+    fuelLeft: fuelLeft.kmsLeft,
+    averagePer100Km: fuelLeft.averagePer100Km,
+    litresLeft: fuelLeft.litresLeft
+    
+
   };
   return finalResult;
 }
 
-const calculateFuelLeft = async (refillData, trips) => {
-      console.log(refillData, trips, 'REFILLDATA AND TRIPS')
+const calculateFuelLeft =  (refillData, trips) => {
       const refillTimeStamp = new Date(refillData[0].timestamp);
       const refillLitres = parseFloat(refillData[0].litres);
     
@@ -171,8 +174,9 @@ const calculateFuelLeft = async (refillData, trips) => {
   
       const litresLeft = refillLitres - totalLitresUsed;
       const averagePer100Km =  (totalLitresUsed / totalDistance) * 100;
-      const kmsLeft = (totalDistance / totalLitresUsed) * litresLeft;
-      return totalDistance;
+      const kmsLeft = (litresLeft / averagePer100Km) * 100;
+      
+      return {kmsLeft, averagePer100Km, litresLeft}
       
 }
 

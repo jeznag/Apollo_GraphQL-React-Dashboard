@@ -33,6 +33,7 @@ export default function LoginPage(props) {
         {...props}
         handleSuccessfulLogin={handleSuccessfulLogin(router)}
       />
+      
     </ApolloProvider>
   );
 }
