@@ -1,2 +1,6 @@
 node_modules
 .history
+
+.now
+client/.next
+.next

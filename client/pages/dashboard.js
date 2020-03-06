@@ -1,5 +1,6 @@
 import DashboardView from '../src/pages/Dashboard/DashboardView';
-import React from 'react';
+import React, {useEffect} from 'react';
+import Router from 'next/router'
 import Cookiez from 'next-cookies';
 import fetch from 'node-fetch';
 import ApolloClient from 'apollo-boost';
@@ -10,6 +11,11 @@ const link = createHttpLink({ uri: '/graphql', fetch: fetch });
 
 export default function DashboardPage(props) {
   // TODO if not logged in redirect to login
+  useEffect(() => {
+    if(!props.token){
+      Router.push('/')
+    }
+  });
 
   const client = new ApolloClient({
     uri:

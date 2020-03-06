@@ -4,7 +4,8 @@
   "description": "",
   "main": "goFarAPIResolver.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "test-debug": "node --inspect-brk ./node_modules/.bin/jest"
   },
   "author": "",
   "license": "ISC",

@@ -1,5 +1,4 @@
 import { gql } from 'apollo-boost';
-
 const LOGIN_QUERY = gql`
   query Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
@@ -9,7 +8,6 @@ const LOGIN_QUERY = gql`
     }
   }
 `;
-
 const getCarsQuery = gql`
   {
     cars {
@@ -18,7 +16,6 @@ const getCarsQuery = gql`
     }
   }
 `;
-
 const getUserDataQuery = gql`
   {
     userData {
@@ -33,7 +30,6 @@ const getUserDataQuery = gql`
     }
   }
 `;
-
 const getDashboardAllDataQuery = gql`
   query getDataForCar($vehicleId: ID!) {
     car(id: $vehicleId) {
@@ -59,6 +55,7 @@ const getDashboardAllDataQuery = gql`
         lng
       }
       kmsLeft
+      lifeAveragePer100Km
       averagePer100Km
       litresLeft
       travelSince
@@ -131,7 +128,6 @@ const getDashboardAllDataQuery = gql`
     }
   }
 `;
-
 export {
   getCarsQuery,
   getUserDataQuery,

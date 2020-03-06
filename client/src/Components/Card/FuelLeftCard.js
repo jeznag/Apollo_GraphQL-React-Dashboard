@@ -4,7 +4,7 @@ import FuelEconomyCard from './FuelEconomyCard';
 
 class FuelLeftCard extends Component {
   render() {
-    if ((!this.props.lastRefillOdo[0], !this.props.kmsLeft)) {
+    if (!this.props.lastRefillOdo[0]) {
       return (
         <Card className="data-cards-r1">
           <Card.Content>
@@ -45,14 +45,14 @@ class FuelLeftCard extends Component {
             />
             <div className="data-content">
               <p>Estimated Fuel Left</p>
-              <h2>{kmsLeft.toFixed(1) > 0 ? kmsLeft : '0'} km</h2>
+              <h2>{kmsLeft.toFixed(1)} km</h2>
             </div>
             <Card.Content extra>
               <hr></hr>
               <p> {this.kmSinceLastRefillRounded} km (since last fill up) </p>
               <p>
                 Litres left since refill:
-                {litresLeft.toFixed(2) > 0 ? litresLeft : '0'} L
+                 {litresLeft.toFixed(2)} L
               </p>
             </Card.Content>
           </Card.Content>
