@@ -9,7 +9,6 @@ import DiagnosticCard from './Card/DiagnosticCard';
 import BusinessRatioCard from './Card/BusinessRatioCard';
 import AverageSpeedCard from './Card/AverageSpeedCard';
 import TravelDistanceTotalCard from './Card/TravelDistanceTotalCard';
-import TimeInCarCard from './Card/TimeInCarCard';
 import EmissionsCard from './Card/EmissionsCard';
 import FuelEconomyCard from './Card/FuelEconomyCard';
 import GoogleMap from './GoogleMap/GoogleMap';
