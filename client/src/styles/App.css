@@ -59,6 +59,7 @@ body {
 
 .ui.cards {
   justify-content: center;
+  padding-bottom: 1em;
 }
 
 .ui.segment {

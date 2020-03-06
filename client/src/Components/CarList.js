@@ -3,6 +3,7 @@ import { useQuery } from '@apollo/react-hooks';
 import Select from 'react-select';
 import { getUserDataQuery } from '../queries/queries';
 import LoadingSpinner from './LoadingSpinner';
+import Router from 'next/router'
 
 function displayCars(data) {
   return data.cars.map(car => {
@@ -12,6 +13,7 @@ function displayCars(data) {
     };
   });
 }
+
 
 export default function(props) {
   const { loading, error, data } = useQuery(getUserDataQuery);
