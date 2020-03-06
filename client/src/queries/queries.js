@@ -59,6 +59,7 @@ const getDashboardAllDataQuery = gql`
         lng
       }
       kmsLeft
+      lifeAveragePer100Km
       averagePer100Km
       litresLeft
       travelSince

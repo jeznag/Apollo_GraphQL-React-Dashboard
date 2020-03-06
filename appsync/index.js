@@ -94,6 +94,63 @@ async function getTripSummaryData(userId, authToken) {
   return await fetchJSON(travelDistanceTotalUrl.toString(), {}, authToken);
 }
 
+const getTotalForTrips = (trips, metric) => {
+  return trips.reduce((total, trip) => {
+    if (trip[metric]) {
+      const parsedMetricValue = parseFloat(trip[metric]);
+      if (!Number.isNaN(parsedMetricValue)) {
+        return total + parsedMetricValue;
+      }
+    }
+
+    return total;
+  }, 0);
+};
+
+const lifeAverageKms = trips => {
+  const lifeLitresUsed = getTotalForTrips(trips, "litres");
+  const lifeDistance = getTotalForTrips(trips, "distance");
+
+  const lifeAveragePer100Km = (lifeLitresUsed / lifeDistance) * 100;
+
+  return { lifeAveragePer100Km };
+};
+
+const calculateFuelLeft = (refillData, trips, lifeAverageKms) => {
+  if (
+    refillData.length === 0 ||
+    !refillData[0].timestamp ||
+    !refillData[0].litres
+  ) {
+    return {
+      kmsLeft: 0,
+      litresLeft: 0,
+      averagePer100Km: 0
+    };
+  }
+  const refillTimeStamp = new Date(refillData[0].timestamp);
+  const refillLitres = parseFloat(refillData[0].litres);
+
+  const filteredTrips = trips.filter(trips => {
+    return refillTimeStamp <= new Date(trips.endTime);
+  });
+
+  const totalLitresUsed = getTotalForTrips(filteredTrips, "litres");
+  const totalDistance = getTotalForTrips(filteredTrips, "distance");
+
+  const litresLeft = Math.max(0, (refillLitres || 0) - (totalLitresUsed || 0));
+
+  const averagePer100Km =
+    totalDistance > 0
+      ? (totalLitresUsed / totalDistance) * 100
+      : lifeAverageKms.lifeAveragePer100Km;
+
+  const kmsLeft =
+    averagePer100Km > 0 ? (litresLeft / averagePer100Km) * 100 : 0;
+
+  return { kmsLeft, litresLeft, averagePer100Km };
+};
+
 async function getDetailsForVehicle(userId, vehicleId, authToken) {
   const [
     vehicleData,
@@ -112,7 +169,12 @@ async function getDetailsForVehicle(userId, vehicleId, authToken) {
     getRecentTrip(vehicleId, authToken),
     getParkedUserVehicles(userId, authToken)
   ]);
-  const fuelLeft = calculateFuelLeft(refillData, tripsForVehicle);
+  const lifeAveragePerKm = lifeAverageKms(tripsForVehicle);
+  const fuelLeft = calculateFuelLeft(
+    refillData,
+    tripsForVehicle,
+    lifeAveragePerKm
+  );
   const finalResult = {
     id: vehicleId,
     make: vehicleData.make,
@@ -139,62 +201,15 @@ async function getDetailsForVehicle(userId, vehicleId, authToken) {
     parking: recentTrip.location,
     timeTraveled: tripSummaryData.TODO,
     trips: tripsForVehicle,
-    lifeLitresPerHundredKm: tripsForVehicle,
     recentTrip: recentTrip,
     parkedVehicle: parkedUserVehicles,
     fuelLeft: fuelLeft.kmsLeft,
     averagePer100Km: fuelLeft.averagePer100Km,
-    litresLeft: fuelLeft.litresLeft
+    litresLeft: fuelLeft.litresLeft,
+    lifeAveragePerKm: lifeAverageKms
   };
   return finalResult;
 }
-
-const calculateFuelLeft = (refillData, trips) => {
-  const refillTimeStamp = new Date(refillData[0].timestamp);
-  const refillLitres = parseFloat(refillData[0].litres);
-
-  const filteredTrips = trips.filter(trips => {
-    return refillTimeStamp <= new Date(trips.endTime);
-  });
-
-  const totalLitresUsed = filteredTrips.reduce((total, trip) => {
-    return total + parseFloat(trip.litres);
-  }, 0);
-
-  const totalDistance = filteredTrips.reduce((total, trip) => {
-    return total + parseFloat(trip.distance);
-  }, 0);
-
-  const litresLeftFunc = (refillLitres, totalLitresUsed) => {
-    if (!refillLitres && !totalLitresUsed) {
-      return 0;
-    } else {
-      return refillLitres - totalLitresUsed;
-    }
-  };
-  const litresLeft = litresLeftFunc(refillLitres, totalLitresUsed);
-
-  const averagePer100KmFunc = (totalLitresUsed, totalDistance) => {
-    if (!totalLitresUsed || !totalDistance) {
-      return 0;
-    } else {
-      return (totalLitresUsed / totalDistance) * 100;
-    }
-  };
-
-  const kmsLeftFunc = (litresLeft, averagePer100Km) => {
-    if (!litresLeft || !averagePer100Km) {
-      return 0;
-    } else {
-      return (litresLeft / averagePer100Km) * 100;
-    }
-  };
-  // const oldAveragePer100Km = averagePer100Km;
-  const averagePer100Km = averagePer100KmFunc(totalLitresUsed, totalDistance);
-  const kmsLeft = kmsLeftFunc(litresLeft, averagePer100Km);
-
-  return { kmsLeft, averagePer100Km, litresLeft };
-};
 
 async function getLogin(email, password) {
   const loginURL = `${API_URL}users/login`;
@@ -202,6 +217,7 @@ async function getLogin(email, password) {
 }
 
 exports.calculateFuelLeft = calculateFuelLeft;
+exports.lifeAverageKms = lifeAverageKms;
 
 exports.handler = async (event, context) => {
   console.log("Received event", JSON.stringify(event, 3));

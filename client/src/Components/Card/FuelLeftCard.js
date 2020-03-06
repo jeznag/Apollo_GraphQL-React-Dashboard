@@ -4,7 +4,7 @@ import FuelEconomyCard from './FuelEconomyCard';
 
 class FuelLeftCard extends Component {
   render() {
-    if ((!this.props.lastRefillOdo[0], !this.props.kmsLeft)) {
+    if (!this.props.lastRefillOdo[0]) {
       return (
         <Card className="data-cards-r1">
           <Card.Content>

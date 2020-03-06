@@ -32,6 +32,7 @@
     "start": "next start",
     "build": "next build",
     "test": "react-scripts test",
+    "test-debug": "node --inspect ./node_modules/.bin/jest",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
