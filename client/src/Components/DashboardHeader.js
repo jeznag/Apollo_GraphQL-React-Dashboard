@@ -21,7 +21,7 @@ export default function DashboardHeader(props) {
   } else {
     return (
       <div className="hero-img" style={{ height:"300px" }}>
-        <Header as="h1">What can we help you with {userData.userData.firstName}</Header>
+        <Header as="h1">Welcome back {userData.userData.firstName}</Header>
         <div className="hero-img-car-data">
           <h1 style={{ color: '#fff' }}>
             {carData.car.make} {carData.car.model}'s Lifetime Statistics from

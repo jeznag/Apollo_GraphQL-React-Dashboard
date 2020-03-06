@@ -86,7 +86,7 @@ describe("getFuelLeftData", () => {
   });
 
   test("Problematic data", () => {
-    const fakeTrips = testTrips; //[{ distance: 5, litres: 2, endTime: "2020-01-01" }];
+    const fakeTrips = testTrips; 
     const fakeRefills = [
       {
         id: "fa04beea-7980-4267-8230-0250b4a65ded",

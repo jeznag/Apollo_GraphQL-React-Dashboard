@@ -12,7 +12,7 @@ class SimpleMap extends Component {
 
         return {
           locations: [tripStart?.geoPoint, tripEnd?.geoPoint],
-          numberOfEvents: parseFloat(trip.numberOfEvents) / trip.distance,
+          numEventsPerKm: parseFloat(trip.numberOfEvents) / trip.distance,
         };
       })
       .filter(tripData => {
@@ -21,7 +21,7 @@ class SimpleMap extends Component {
       });
 
     // centers the map to last location
-    const initialCenter = this.props.trips
+    const tripsWithEndLocations = this.props.trips
       .map(trip => {
         const center = trip.endLocation;
         return center?.geoPoint;
@@ -30,22 +30,15 @@ class SimpleMap extends Component {
         return endLocation;
       });
 
-    // using number of events and color coding them based on distance traveled and number of events
-    // const numberEvents = this.props.trips.map(trip => {
-    //   const events = trip.numberOfEvents;
-    //   return events;
-    // });
-
-    // gforce color
     const getGforceColor = numberEvents => {
-      const color = ['red', 'orange', 'green'];
       if (numberEvents > 15) {
-        return color[0];
+        return 'red'
       } else if (numberEvents > 5) {
-        return color[1];
+        return 'orange'
       } else if (numberEvents < 5) {
-        return color[2];
+        return 'green'
       }
+      console.log()
     };
 
     return (
@@ -59,13 +52,13 @@ class SimpleMap extends Component {
             google={this.props.google}
             zoom={11}
             className={'map'}
-            initialCenter={initialCenter[initialCenter.length - 1]}
+            initialCenter={tripsWithEndLocations[tripsWithEndLocations.length - 1]}
           >
             {tripPoints.map(tripData => {
               return (
                 <Polyline
                   path={tripData.locations}
-                  strokeColor={getGforceColor(tripData.numberOfEvents)}
+                  strokeColor={getGforceColor(tripData.numEventsPerKm)}
                   strokeOpacity={0.5}
                   strokeWeight={2}
                 />

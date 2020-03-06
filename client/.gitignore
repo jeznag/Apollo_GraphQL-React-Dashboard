@@ -28,12 +28,4 @@ yarn-error.log*
 .history
 .now
 .next
-
-<<<<<<< HEAD
-# API
-Google_Secret.js
-=======
-.now
 client/.next
-.next
->>>>>>> a152711f940f69b3cfb3c4c9f359e996fc162345
