@@ -7,7 +7,7 @@
       rgba(41, 39, 41, 0.322),
       rgba(0, 0, 0, 0.466)
     ),
-    url("https://res.cloudinary.com/asheu321/image/upload/f_auto/bg-hero.jpg");
+    url('https://res.cloudinary.com/asheu321/image/upload/f_auto/bg-hero.jpg');
 }
 
 .ui.statistic > .value,
@@ -59,6 +59,8 @@ body {
 
 .ui.cards {
   justify-content: center;
+  padding-bottom: 1em;
+  padding-top: 1em;
 }
 
 .ui.segment {

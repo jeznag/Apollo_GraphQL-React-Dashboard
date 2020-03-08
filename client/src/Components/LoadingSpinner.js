@@ -1,10 +1,10 @@
-import React from "react";
-import { Dimmer, Loader, Segment } from "semantic-ui-react";
+import React from 'react';
+import { Dimmer, Loader, Segment } from 'semantic-ui-react';
 
 const LoadingSpinner = () => (
   <Segment>
-    <Dimmer active>
-      <Loader size="massive">Loading</Loader>
+    <Dimmer active style={{padding:"40px"}}>
+      <Loader size="massive" />
     </Dimmer>
   </Segment>
 );

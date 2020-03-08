@@ -1,12 +1,14 @@
 import React from 'react';
 import { Container } from 'semantic-ui-react';
 import LoginForm from '../../Components/Login/LoginForm';
-import Navbar from '../../Components/Navbar';
 import LoginHeroImage from '../../Images/loginHeroImage.jpg';
 import LoadingSpinner from '../../Components/LoadingSpinner';
 import { LOGIN_QUERY } from '../../queries/queries';
 import { useLazyQuery } from '@apollo/react-hooks';
+import { Route } from 'react-router-dom';
 
+// import 'semantic-ui-css/semantic.min.css';
+// import '../src/styles/App.css';
 const renderBody = executeLogin => {
   return (
     <LoginForm
@@ -27,10 +29,11 @@ const LoginView = props => {
   const enteredInvalidPassword = data && data.login && !data.login.successful;
 
   if (!loading && data && data.login && data.login.successful) {
-    props.handleLoggedIn({
+    props.handleSuccessfulLogin({
       authToken: data.login.authToken,
       userId: data.login.userId,
     });
+    <Route path="/dashboard" />;
   }
 
   return (
@@ -39,7 +42,6 @@ const LoginView = props => {
         className="bg-image"
         style={{ backgroundImage: `url(${LoginHeroImage})` }}
       >
-        <Navbar />
         {/* todo proper error bar  */}
         {enteredInvalidPassword && <p>Invalid Password</p>}
         {loading && <LoadingSpinner />}

@@ -9,7 +9,6 @@ import DiagnosticCard from './Card/DiagnosticCard';
 import BusinessRatioCard from './Card/BusinessRatioCard';
 import AverageSpeedCard from './Card/AverageSpeedCard';
 import TravelDistanceTotalCard from './Card/TravelDistanceTotalCard';
-import TimeInCarCard from './Card/TimeInCarCard';
 import EmissionsCard from './Card/EmissionsCard';
 import FuelEconomyCard from './Card/FuelEconomyCard';
 import GoogleMap from './GoogleMap/GoogleMap';
@@ -31,43 +30,34 @@ export default function CarData(props) {
       <div className="ui container">
         <Card.Group>
           <LastFillUpCard lastFillUpData={data.car.refillData} />
-
           <FuelLeftCard
-            fuelLeft={data.car.fuelLeft}
             travelSince={data.car.recentTrip}
             lastRefillOdo={data.car.refillData}
             currentOdo={data.car.odometer}
+            kmsLeft={data.car.kmsLeft}
+            litresLeft={data.car.litresLeft}
           />
-          <DiagnosticCard
-            // diagnosticIssue={data.car.diagnosticIssue}
-            diagnosticDetail={data.car.diagnosticDetail}
-          />
+          <DiagnosticCard diagnosticIssue={data.car.diagnosticIssue} />
           <BusinessRatioCard
             businessRatio={data.car.businessRatio}
             businessTotal={data.car.businessTotal}
           />
+          <AverageSpeedCard speed={data.car.averageSpeed} />
+          <TravelDistanceTotalCard
+            distanceTotal={data.car.travelDistanceTotal}
+            distanceTotalThisYear={data.car.travelDistanceThisYear}
+          />
+          <EmissionsCard emission={data.car.emissions} />
         </Card.Group>
-        <div className="ui container">
-          <GoogleMap />
-        </div>
-        <div className="ui container">
-          <Card.Group>
-            <AverageSpeedCard speed={data.car.averageSpeed} />
-            <TravelDistanceTotalCard
-              distanceTotal={data.car.travelDistanceTotal}
-              distanceTotalThisYear={data.car.travelDistanceThisYear}
-            />
-            <TimeInCarCard timeInCar={data.car.timeInCar} />
-          </Card.Group>
-        </div>
         <div className="ui container">
           <Card.Group>
             <EmissionsCard emission={data.car.emissions} />
-            <FuelEconomyCard fuelEconomy={data.car.fuelEconomy} />
+            <FuelEconomyCard averagePer100Km={data.car.averagePer100Km} />
           </Card.Group>
+          <GoogleMap trips={data.car.trips} />
         </div>
         <div className="ui container">
-          <AntdTableComponent />
+          <AntdTableComponent tripData={data.car.trips} />
         </div>
       </div>
     );

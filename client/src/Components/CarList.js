@@ -13,6 +13,7 @@ function displayCars(data) {
   });
 }
 
+
 export default function(props) {
   const { loading, error, data } = useQuery(getUserDataQuery);
 

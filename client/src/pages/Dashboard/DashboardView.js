@@ -22,17 +22,21 @@ export default function DashboardView() {
   } else {
     return (
       <>
-        <CarList vehicleSelection={selectVehicle} />
+        <div style={{paddingTop:"5vh"}}>
+          <CarList vehicleSelection={selectVehicle} />
+        </div>
         <div
-          style={{ height: '500px', textAlign: 'center', paddingTop: '50px' }}
+          style={{ height: '500px', textAlign: 'center', paddingTop: '50px', paddingBottom:'50px' }}
         >
-          <h1>You have to chose a vehicle</h1>
+          <h1>You have to choose a vehicle</h1>
           <img
             src="https://media.giphy.com/media/xT3i0ZscbtF5DvLrGg/giphy.gif"
             alt="Patrick-Gif"
           />
         </div>
-        <Footer />
+        <div style={{paddingTop:"10vh"}}>
+          <Footer />
+        </div>
       </>
     );
   }

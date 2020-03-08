@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { Card, Icon } from "semantic-ui-react";
+import React, { Component } from 'react';
+import { Card, Icon } from 'semantic-ui-react';
 
 class TravelDistanceTotalCard extends Component {
   render() {
@@ -8,9 +8,8 @@ class TravelDistanceTotalCard extends Component {
         <Card.Content>
           <Icon circular inverted color="brown" name="road" size="big" />
           <div className="data-content">
-            <p>Total Distance</p>
-            <h2>{this.props.distanceTotal} km</h2>
-            <h2>{this.props.distanceTotalThisYear} km</h2>
+            <span>Overall Total Driven<h3>{this.props.distanceTotal} km</h3> </span>
+            <span>Total Driven This Year<h3>{this.props.distanceTotalThisYear} km</h3> </span>
           </div>
           <Card.Content extra></Card.Content>
         </Card.Content>

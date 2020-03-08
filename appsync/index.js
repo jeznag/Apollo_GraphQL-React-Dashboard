@@ -14,7 +14,6 @@ async function fetchJSON(url, options, authToken) {
 }
 
 async function postJSON(url, payload, options) {
-  console.log(url, payload, options);
   const rawResponse = await fetch(url, {
     method: "POST",
     headers: {
@@ -42,9 +41,8 @@ async function getOwnedVehicles(userId, authToken) {
 }
 
 async function getTripsForVehicle(vehicleId, authToken) {
-  console.log(`${API_URL}vehicles/${vehicleId}/trips`, authToken);
   return await fetchJSON(
-    `${API_URL}vehicles/${vehicleId}/trips?filter={"include":["tags"]}`,
+    `${API_URL}vehicles/${vehicleId}/trips?filter={"include":["tags", "startLocation", "endLocation"]}`,
     {},
     authToken
   );
@@ -60,14 +58,17 @@ async function getRecentTrip(vehicleId, authToken) {
   return await fetchJSON(recentTrip.toString(), {}, authToken);
 }
 
-// async function getTripDetailsforVehicle(tripId, authToken) {
-//   return await fetchJSON(`${API_URL}trips/${tripId}/tripDetails`, {}, authToken);
-// }
+async function getParkedUserVehicles(userId, authToken) {
+  return await fetchJSON(
+    `${API_URL}/users/${userId}/parkedVehicles`,
+    {},
+    authToken
+  );
+}
 
 async function getDiagnosticIssueForVehicle(vehicleId, authToken) {
-  console.log(`${API_URL}/Vehicles/${vehicleId}/diagnosticTroubleCodes`);
   return await fetchJSON(
-    `${API_URL}/vehicles/${vehicleId}/diagnosticTroubleCodes`,
+    `${API_URL}/vehicles/${vehicleId}/diagnosticTroubleCodes?filter={"where":{"isActive":true}}`,
     {},
     authToken
   );
@@ -93,6 +94,63 @@ async function getTripSummaryData(userId, authToken) {
   return await fetchJSON(travelDistanceTotalUrl.toString(), {}, authToken);
 }
 
+const getTotalForTrips = (trips, metric) => {
+  return trips.reduce((total, trip) => {
+    if (trip[metric]) {
+      const parsedMetricValue = parseFloat(trip[metric]);
+      if (!Number.isNaN(parsedMetricValue)) {
+        return total + parsedMetricValue;
+      }
+    }
+
+    return total;
+  }, 0);
+};
+
+const lifeAverageKms = trips => {
+  const lifeLitresUsed = getTotalForTrips(trips, "litres");
+  const lifeDistance = getTotalForTrips(trips, "distance");
+
+  const lifeAveragePer100Km = (lifeLitresUsed / lifeDistance) * 100;
+
+  return { lifeAveragePer100Km };
+};
+
+const calculateFuelLeft = (refillData, trips, lifeAverageKms) => {
+  if (
+    refillData.length === 0 ||
+    !refillData[0].timestamp ||
+    !refillData[0].litres
+  ) {
+    return {
+      kmsLeft: 0,
+      litresLeft: 0,
+      averagePer100Km: 0
+    };
+  }
+  const refillTimeStamp = new Date(refillData[0].timestamp);
+  const refillLitres = parseFloat(refillData[0].litres);
+
+  const filteredTrips = trips.filter(trips => {
+    return refillTimeStamp <= new Date(trips.endTime);
+  });
+
+  const totalLitresUsed = getTotalForTrips(filteredTrips, "litres");
+  const totalDistance = getTotalForTrips(filteredTrips, "distance");
+
+  const litresLeft = Math.max(0, (refillLitres || 0) - (totalLitresUsed || 0));
+
+  const averagePer100Km =
+    totalDistance > 0
+      ? (totalLitresUsed / totalDistance) * 100
+      : lifeAverageKms.lifeAveragePer100Km;
+
+  const kmsLeft =
+    averagePer100Km > 0 ? (litresLeft / averagePer100Km) * 100 : 0;
+
+  return { kmsLeft, litresLeft, averagePer100Km };
+};
+
 async function getDetailsForVehicle(userId, vehicleId, authToken) {
   const [
     vehicleData,
@@ -100,18 +158,23 @@ async function getDetailsForVehicle(userId, vehicleId, authToken) {
     tripSummaryData,
     tripsForVehicle,
     diagnosticIssueForVehicle,
-    recentTrip
+    recentTrip,
+    parkedUserVehicles
   ] = await Promise.all([
     getVehicleData(vehicleId, authToken),
     getRefillData(vehicleId, authToken),
     getTripSummaryData(userId, authToken),
     getTripsForVehicle(vehicleId, authToken),
     getDiagnosticIssueForVehicle(vehicleId, authToken),
-    getRecentTrip(vehicleId, authToken)
+    getRecentTrip(vehicleId, authToken),
+    getParkedUserVehicles(userId, authToken)
   ]);
-
-  console.log("refillData PLEASE LOOK AT THIS LOG", recentTrip);
-
+  const lifeAveragePerKm = lifeAverageKms(tripsForVehicle);
+  const fuelLeft = calculateFuelLeft(
+    refillData,
+    tripsForVehicle,
+    lifeAveragePerKm
+  );
   const finalResult = {
     id: vehicleId,
     make: vehicleData.make,
@@ -119,10 +182,6 @@ async function getDetailsForVehicle(userId, vehicleId, authToken) {
     odometer: vehicleData.calculatedOdometer,
     vehicleName: vehicleData.displayName,
     refillData: refillData,
-    odometerAtRefill: refillData.TODO,
-    lastFillUp: refillData.TODO,
-    lastFillUpTime: refillData.TODO,
-    lastLocation: refillData.TODO,
     diagnosticIssue: diagnosticIssueForVehicle,
     diagnosticDetail: "TODO",
     travelSince: recentTrip.TODO,
@@ -139,15 +198,15 @@ async function getDetailsForVehicle(userId, vehicleId, authToken) {
     accelerationScore: tripSummaryData.accelerationScore,
     totalScore: tripSummaryData.score,
     travelDistanceThisYear: 100,
-    fuelLeft: 999,
-    parking: {
-      lat: 99,
-      lon: 99
-    },
+    parking: recentTrip.location,
     timeTraveled: tripSummaryData.TODO,
     trips: tripsForVehicle,
-    lifeLitresPerHundredKm: tripsForVehicle,
-    recentTrip: recentTrip
+    recentTrip: recentTrip,
+    parkedVehicle: parkedUserVehicles,
+    fuelLeft: fuelLeft.kmsLeft,
+    averagePer100Km: fuelLeft.averagePer100Km,
+    litresLeft: fuelLeft.litresLeft,
+    lifeAveragePerKm: lifeAverageKms
   };
   return finalResult;
 }
@@ -156,6 +215,9 @@ async function getLogin(email, password) {
   const loginURL = `${API_URL}users/login`;
   return await postJSON(loginURL.toString(), { email, password });
 }
+
+exports.calculateFuelLeft = calculateFuelLeft;
+exports.lifeAverageKms = lifeAverageKms;
 
 exports.handler = async (event, context) => {
   console.log("Received event", JSON.stringify(event, 3));
@@ -200,6 +262,7 @@ exports.handler = async (event, context) => {
 
       return {
         ...ownerData,
+        firstName: ownerData.firstname,
         cars: ownedVehicles
       };
     }

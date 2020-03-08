@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { Card, Icon } from "semantic-ui-react";
+import React, { Component } from 'react';
+import { Card, Icon } from 'semantic-ui-react';
 
 class AverageSpeedCard extends Component {
   render() {

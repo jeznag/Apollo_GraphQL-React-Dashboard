@@ -1,5 +1,4 @@
 import { gql } from 'apollo-boost';
-
 const LOGIN_QUERY = gql`
   query Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
@@ -9,7 +8,6 @@ const LOGIN_QUERY = gql`
     }
   }
 `;
-
 const getCarsQuery = gql`
   {
     cars {
@@ -18,7 +16,6 @@ const getCarsQuery = gql`
     }
   }
 `;
-
 const getUserDataQuery = gql`
   {
     userData {
@@ -33,7 +30,6 @@ const getUserDataQuery = gql`
     }
   }
 `;
-
 const getDashboardAllDataQuery = gql`
   query getDataForCar($vehicleId: ID!) {
     car(id: $vehicleId) {
@@ -58,13 +54,15 @@ const getDashboardAllDataQuery = gql`
         lat
         lng
       }
-      fuelLeft
+      kmsLeft
+      lifeAveragePer100Km
+      averagePer100Km
+      litresLeft
       travelSince
       diagnosticIssue {
         code
         isActive
       }
-      diagnosticDetail
       businessRatio
       businessTotal
       averageSpeed
@@ -73,13 +71,6 @@ const getDashboardAllDataQuery = gql`
       timeInCar
       emissions
       fuelEconomy
-      lifeLitresPerHundredKm {
-        litresPerHundredKm
-      }
-      parking {
-        lat
-        lng
-      }
       timeTraveled
       recentTrip {
         id
@@ -98,6 +89,7 @@ const getDashboardAllDataQuery = gql`
         }
       }
       trips {
+        numberOfEvents
         litres
         litresPerHundredKm
         distance
@@ -110,11 +102,32 @@ const getDashboardAllDataQuery = gql`
           id
           tagType
         }
+        startLocation {
+          displayName
+          geoPoint {
+            lat
+            lng
+          }
+        }
+        endLocation {
+          displayName
+          geoPoint {
+            lat
+            lng
+          }
+        }
+      }
+      parkedVehicle {
+        name
+        location {
+          lat
+          lng
+        }
+        timestamp
       }
     }
   }
 `;
-
 export {
   getCarsQuery,
   getUserDataQuery,
